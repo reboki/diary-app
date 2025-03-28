@@ -1,8 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\Diary;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DiaryController extends Controller
 {
@@ -27,7 +28,20 @@ class DiaryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // バリデーション（入力チェック）
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'body' => 'required|string',
+        ]);
+        // DBに保存
+        Diary::create([
+            'user_id' => Auth::id(),
+            'title' => $request->input('title'),
+            'body' => $request->input('body'),
+            'image_url' => null,
+        ]);
+        // 投稿後のリダイレクト（とりあえず投稿フォームに戻す）
+        return redirect()->route('diaries.create')->with('success','投稿できたよ！');
     }
 
     /**
